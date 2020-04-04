@@ -1,5 +1,6 @@
 #include <iostream>
 #include <experimental/filesystem>
+#include <boost/algorithm/string.hpp>
 #include "MatteProcessing.h"
 #include "argparse.h"
 
@@ -15,7 +16,7 @@ std::vector<std::string> get_filenames( std::experimental::filesystem::path path
     for( stdfs::directory_iterator iter{path} ; iter != end ; ++iter )
     {
         // http://en.cppreference.com/w/cpp/experimental/fs/is_regular_file
-        if( stdfs::is_regular_file(*iter) ) // comment out if all names (names of directories tc.) are required
+        if( stdfs::is_regular_file(*iter) && boost::algorithm::contains(iter->path().string(), ".png")) // comment out if all names (names of directories tc.) are required
             filenames.push_back( iter->path().string() ) ;
     }
 
@@ -33,6 +34,7 @@ int main(int argc, const char* argv[])
     // Begin Matte extraction
     std::unique_ptr<MatteProcessing> matteProcessing = std::make_unique<MatteProcessing>();
     for(const auto& name : get_filenames(folderPath)){
+        std::cout << "processing image: " << name << std::endl;
         matteProcessing->processMatte(name);
     }
 
